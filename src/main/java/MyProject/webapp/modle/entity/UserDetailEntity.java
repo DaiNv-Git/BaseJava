@@ -1,6 +1,9 @@
 package MyProject.webapp.modle.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -11,13 +14,16 @@ import java.util.List;
 @Entity
 @Table(name = "User_Detail")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDetailEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
     @Column(name = "Full_Name", nullable = false)
-    private String workTitle;
+    private String fullName;
     @Column(name = "Tel")
     private String tel;
     @Column(name = "Email", unique = true, nullable = false)

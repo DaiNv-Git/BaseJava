@@ -6,10 +6,14 @@ import MyProject.webapp.modle.entity.ShiftEntity;
 import MyProject.webapp.modle.entity.UserDetailEntity;
 import MyProject.webapp.modle.entity.WorkTypeEntity;
 import MyProject.webapp.modle.entity.WorkingScheduleEntity;
-import MyProject.webapp.modle.request.ScheduleForUserForm;
+import MyProject.webapp.modle.request.ScheduleForUserAddForm;
+import MyProject.webapp.modle.request.ScheduleForUserEditForm;
+import MyProject.webapp.modle.response.ShiftResponse;
+import MyProject.webapp.modle.response.WorkTypeResponse;
 import MyProject.webapp.modle.response.schedule.ScheduleUserDetailResponse;
 import MyProject.webapp.modle.response.schedule.ScheduleUserResponse;
 import MyProject.webapp.repository.repositoryjpa.ShiftRepository;
+import MyProject.webapp.repository.repositoryjpa.UserDetailReposirory;
 import MyProject.webapp.repository.repositoryjpa.WorkTypeRepository;
 import MyProject.webapp.repository.repositoryjpa.WorkingScheduleRepository;
 import MyProject.webapp.service.WorkingScheduleSerivice;
@@ -31,11 +35,13 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
     private final WorkingScheduleRepository workingScheduleRepository;
     private final ShiftRepository shiftRepository;
     private final WorkTypeRepository workTypeRepository;
+    private final UserDetailReposirory userDetailReposirory;
 
-    public WorkingScheduleSeriviceImpl(WorkingScheduleRepository workingScheduleRepository, ShiftRepository shiftRepository, WorkTypeRepository workTypeRepository) {
+    public WorkingScheduleSeriviceImpl(WorkingScheduleRepository workingScheduleRepository, ShiftRepository shiftRepository, WorkTypeRepository workTypeRepository, UserDetailReposirory userDetailReposirory) {
         this.workingScheduleRepository = workingScheduleRepository;
         this.shiftRepository = shiftRepository;
         this.workTypeRepository = workTypeRepository;
+        this.userDetailReposirory = userDetailReposirory;
     }
 
     @Override
@@ -44,7 +50,7 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
             LocalDate parsedStartDate = DateUtils.parseStringToLocalDate(startDate);
             LocalDate parsedEndDate = DateUtils.parseStringToLocalDate(endDate);
 
-            UserDetailEntity user = new UserDetailEntity();
+            UserDetailEntity user = userDetailReposirory.findById(1L).get();
             List<WorkingScheduleEntity> workingScheduleEntities = workingScheduleRepository.findByWorkDateBetweenAndUser(parsedStartDate, parsedEndDate, user);
             if (CollectionUtils.isEmpty(workingScheduleEntities)) return Collections.emptyList();
             return workingScheduleEntities.stream()
@@ -78,18 +84,18 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
     }
 
     @Override
-    public ScheduleUserDetailResponse addScheduleForUser(ScheduleForUserForm scheduleForUserForm) throws DataNotFoundException, GeneralException {
+    public ScheduleUserDetailResponse addScheduleForUser(ScheduleForUserAddForm scheduleForUserAddForm) throws DataNotFoundException, GeneralException {
         try {
-            Optional<ShiftEntity> shiftEntityOtp = shiftRepository.findById(scheduleForUserForm.getShiftId());
+            Optional<ShiftEntity> shiftEntityOtp = shiftRepository.findById(scheduleForUserAddForm.getShiftId());
             if (!shiftEntityOtp.isPresent())
                 throw new DataNotFoundException("Shift ".concat(Messageutils.ITEM_NOT_EXITS));
-            Optional<WorkTypeEntity> workTypeEntityOtp = workTypeRepository.findById(scheduleForUserForm.getWorkTypeId());
+            Optional<WorkTypeEntity> workTypeEntityOtp = workTypeRepository.findById(scheduleForUserAddForm.getWorkTypeId());
             if (!workTypeEntityOtp.isPresent())
                 throw new DataNotFoundException("Work Type ".concat(Messageutils.ITEM_NOT_EXITS));
-            WorkingScheduleEntity entity = new WorkingScheduleEntity(scheduleForUserForm);
+            WorkingScheduleEntity entity = new WorkingScheduleEntity(scheduleForUserAddForm);
             entity.setShift(shiftEntityOtp.get());
             entity.setWorkType(workTypeEntityOtp.get());
-            entity.setUser(new UserDetailEntity());
+            entity.setUser(userDetailReposirory.findById(1L).get());
             var newEntity = workingScheduleRepository.save(entity);
             return new ScheduleUserDetailResponse(newEntity);
         } catch (Exception ex) {
@@ -98,7 +104,7 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
     }
 
     @Override
-    public ScheduleUserDetailResponse updateScheduleForUser(ScheduleForUserForm scheduleForUserUpdateForm) throws DataNotFoundException, GeneralException {
+    public ScheduleUserDetailResponse updateScheduleForUser(ScheduleForUserEditForm scheduleForUserUpdateForm) throws DataNotFoundException, GeneralException {
         try {
             if (!checkCanEditSchedule(DateUtils.parseStringToLocalDate(scheduleForUserUpdateForm.getWorkDate()))) {
                 throw new GeneralException(Messageutils.SCHEDULE_CAN_NOT_EDIT);
@@ -106,25 +112,40 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
             Optional<WorkingScheduleEntity> workingScheduleEntityOtp = workingScheduleRepository.findById(scheduleForUserUpdateForm.getId());
             if (!workingScheduleEntityOtp.isPresent())
                 throw new DataNotFoundException("Work Type ".concat(Messageutils.ITEM_NOT_EXITS));
-            return addScheduleForUser(scheduleForUserUpdateForm);
+            Optional<ShiftEntity> shiftEntityOtp = shiftRepository.findById(scheduleForUserUpdateForm.getShiftId());
+            if (!shiftEntityOtp.isPresent())
+                throw new DataNotFoundException("Shift ".concat(Messageutils.ITEM_NOT_EXITS));
+            Optional<WorkTypeEntity> workTypeEntityOtp = workTypeRepository.findById(scheduleForUserUpdateForm.getWorkTypeId());
+            if (!workTypeEntityOtp.isPresent())
+                throw new DataNotFoundException("Work Type ".concat(Messageutils.ITEM_NOT_EXITS));
+            WorkingScheduleEntity entity = new WorkingScheduleEntity(scheduleForUserUpdateForm);
+            entity.setShift(shiftEntityOtp.get());
+            entity.setWorkType(workTypeEntityOtp.get());
+            entity.setUser(userDetailReposirory.findById(1L).get());
+            var newEntity = workingScheduleRepository.save(entity);
+            return new ScheduleUserDetailResponse(newEntity);
         } catch (Exception ex) {
             throw new GeneralException(ex.getMessage());
         }
     }
 
     @Override
-    public List<WorkTypeEntity> getAllWorkType() throws GeneralException {
+    public List<WorkTypeResponse> getAllWorkType() throws GeneralException {
         try {
-            return workTypeRepository.findAll();
+            return workTypeRepository.findAll().stream()
+                    .filter(Objects::nonNull)
+                    .map(i -> new WorkTypeResponse(i)).collect(Collectors.toList());
         } catch (Exception ex) {
             throw new GeneralException(ex.getMessage());
         }
     }
 
     @Override
-    public List<ShiftEntity> getAllShift() throws GeneralException {
+    public List<ShiftResponse> getAllShift() throws GeneralException {
         try {
-            return shiftRepository.findAll();
+            return shiftRepository.findAll().stream()
+                    .filter(Objects::nonNull)
+                    .map(i -> new ShiftResponse(i)).collect(Collectors.toList());
         } catch (Exception ex) {
             throw new GeneralException(ex.getMessage());
         }

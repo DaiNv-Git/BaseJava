@@ -1,6 +1,7 @@
 package MyProject.webapp.modle.entity;
 
-import MyProject.webapp.modle.request.ScheduleForUserForm;
+import MyProject.webapp.modle.request.ScheduleForUserAddForm;
+import MyProject.webapp.modle.request.ScheduleForUserEditForm;
 import MyProject.webapp.utils.DateUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,12 +44,21 @@ public class WorkingScheduleEntity {
     @JoinColumn(name = "User_Detail_ID")
     private UserDetailEntity user;
 
-    public WorkingScheduleEntity(ScheduleForUserForm scheduleForUserForm) {
-        this.id = scheduleForUserForm.getId() == null ? null : scheduleForUserForm.getId();
-        this.workTitle = scheduleForUserForm.getTitle();
-        this.workDate = DateUtils.parseStringToLocalDate(scheduleForUserForm.getWorkDate());
-        this.startTime = DateUtils.parseStringToLocalTime(scheduleForUserForm.getStartTime());
-        this.endTime = DateUtils.parseStringToLocalTime(scheduleForUserForm.getEndTime());
-        this.description = scheduleForUserForm.getDescription();
+    public WorkingScheduleEntity(ScheduleForUserAddForm scheduleForUserAddForm) {
+
+        this.workTitle = scheduleForUserAddForm.getTitle();
+        this.workDate = DateUtils.parseStringToLocalDate(scheduleForUserAddForm.getWorkDate());
+        this.startTime = DateUtils.parseStringToLocalTime(scheduleForUserAddForm.getStartTime());
+        this.endTime = DateUtils.parseStringToLocalTime(scheduleForUserAddForm.getEndTime());
+        this.description = scheduleForUserAddForm.getDescription();
+    }
+
+    public WorkingScheduleEntity(ScheduleForUserEditForm scheduleForUserEditForm) {
+        this.id = scheduleForUserEditForm.getId();
+        this.workTitle = scheduleForUserEditForm.getTitle();
+        this.workDate = DateUtils.parseStringToLocalDate(scheduleForUserEditForm.getWorkDate());
+        this.startTime = DateUtils.parseStringToLocalTime(scheduleForUserEditForm.getStartTime());
+        this.endTime = DateUtils.parseStringToLocalTime(scheduleForUserEditForm.getEndTime());
+        this.description = scheduleForUserEditForm.getDescription();
     }
 }

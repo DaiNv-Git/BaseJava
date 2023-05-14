@@ -7,9 +7,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class ScheduleForUserForm {
-    @JsonProperty(value = "scheduleId")
-    private Long id;
+public class ScheduleForUserAddForm {
     @JsonProperty(value = "title")
     @NotBlank(message = "Title can not empty")
     private String title;

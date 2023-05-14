@@ -2,9 +2,10 @@ package MyProject.webapp.service;
 
 import MyProject.webapp.exception.DataNotFoundException;
 import MyProject.webapp.exception.GeneralException;
-import MyProject.webapp.modle.entity.ShiftEntity;
-import MyProject.webapp.modle.entity.WorkTypeEntity;
-import MyProject.webapp.modle.request.ScheduleForUserForm;
+import MyProject.webapp.modle.request.ScheduleForUserAddForm;
+import MyProject.webapp.modle.request.ScheduleForUserEditForm;
+import MyProject.webapp.modle.response.ShiftResponse;
+import MyProject.webapp.modle.response.WorkTypeResponse;
 import MyProject.webapp.modle.response.schedule.ScheduleUserDetailResponse;
 import MyProject.webapp.modle.response.schedule.ScheduleUserResponse;
 
@@ -17,11 +18,11 @@ public interface WorkingScheduleSerivice {
 
     void deleteUserSchedule(Long scheduleId) throws GeneralException;
 
-    ScheduleUserDetailResponse addScheduleForUser(ScheduleForUserForm scheduleForUserForm) throws DataNotFoundException, GeneralException;
+    ScheduleUserDetailResponse addScheduleForUser(ScheduleForUserAddForm scheduleForUserAddForm) throws DataNotFoundException, GeneralException;
 
-    ScheduleUserDetailResponse updateScheduleForUser(ScheduleForUserForm scheduleForUserUpdateForm) throws DataNotFoundException, GeneralException;
+    ScheduleUserDetailResponse updateScheduleForUser(ScheduleForUserEditForm scheduleForUserUpdateForm) throws DataNotFoundException, GeneralException;
 
-    List<WorkTypeEntity> getAllWorkType() throws GeneralException;
+    List<WorkTypeResponse> getAllWorkType() throws GeneralException;
 
-    List<ShiftEntity> getAllShift() throws GeneralException;
+    List<ShiftResponse> getAllShift() throws GeneralException;
 }

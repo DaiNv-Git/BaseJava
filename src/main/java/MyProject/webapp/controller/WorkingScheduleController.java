@@ -2,7 +2,8 @@ package MyProject.webapp.controller;
 
 import MyProject.webapp.exception.DataNotFoundException;
 import MyProject.webapp.exception.GeneralException;
-import MyProject.webapp.modle.request.ScheduleForUserForm;
+import MyProject.webapp.modle.request.ScheduleForUserAddForm;
+import MyProject.webapp.modle.request.ScheduleForUserEditForm;
 import MyProject.webapp.modle.response.BaseResponse;
 import MyProject.webapp.service.WorkingScheduleSerivice;
 import MyProject.webapp.utils.Messageutils;
@@ -38,12 +39,12 @@ public class WorkingScheduleController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addScheduleForUser(@Validated @RequestBody ScheduleForUserForm scheduleForUserForm) throws DataNotFoundException, GeneralException {
-        return ResponseEntity.ok(new BaseResponse<>(HttpStatus.OK.value(), Messageutils.SUCCESSFULLY, workingScheduleSerivice.addScheduleForUser(scheduleForUserForm)));
+    public ResponseEntity<Object> addScheduleForUser(@Validated @RequestBody ScheduleForUserAddForm scheduleForUserAddForm) throws DataNotFoundException, GeneralException {
+        return ResponseEntity.ok(new BaseResponse<>(HttpStatus.OK.value(), Messageutils.SUCCESSFULLY, workingScheduleSerivice.addScheduleForUser(scheduleForUserAddForm)));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Object> updateScheduleForUser(@Validated @RequestBody ScheduleForUserForm scheduleForUserUpdateForm) throws DataNotFoundException, GeneralException {
+    public ResponseEntity<Object> updateScheduleForUser(@Validated @RequestBody ScheduleForUserEditForm scheduleForUserUpdateForm) throws DataNotFoundException, GeneralException {
         return ResponseEntity.ok(new BaseResponse<>(HttpStatus.OK.value(), Messageutils.SUCCESSFULLY, workingScheduleSerivice.updateScheduleForUser(scheduleForUserUpdateForm)));
     }
 
