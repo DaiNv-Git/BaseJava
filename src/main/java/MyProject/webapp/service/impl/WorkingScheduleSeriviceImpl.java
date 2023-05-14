@@ -60,7 +60,8 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
     public ScheduleUserDetailResponse getUserScheduleDetai(Long scheduleId) throws GeneralException {
         try {
             Optional<WorkingScheduleEntity> workingScheduleEntityOtp = workingScheduleRepository.findById(scheduleId);
-            if (!workingScheduleEntityOtp.isPresent()) throw new DataNotFoundException("Work Schedule ".concat(Messageutils.ITEM_NOT_EXITS));
+            if (!workingScheduleEntityOtp.isPresent())
+                throw new DataNotFoundException("Work Schedule ".concat(Messageutils.ITEM_NOT_EXITS));
             return new ScheduleUserDetailResponse(workingScheduleEntityOtp.get());
         } catch (Exception ex) {
             throw new GeneralException(ex.getMessage());
@@ -77,27 +78,56 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
     }
 
     @Override
-    public ScheduleUserDetailResponse addScheduleForUser(ScheduleForUserForm scheduleForUserForm) throws DataNotFoundException {
-        Optional<ShiftEntity> shiftEntityOtp = shiftRepository.findById(scheduleForUserForm.getShiftId());
-        if (!shiftEntityOtp.isPresent()) throw new DataNotFoundException("Shift ".concat(Messageutils.ITEM_NOT_EXITS));
-        Optional<WorkTypeEntity> workTypeEntityOtp = workTypeRepository.findById(scheduleForUserForm.getWorkTypeId());
-        if (!workTypeEntityOtp.isPresent()) throw new DataNotFoundException("Work Type ".concat(Messageutils.ITEM_NOT_EXITS));
-        WorkingScheduleEntity entity = new WorkingScheduleEntity(scheduleForUserForm);
-        entity.setShift(shiftEntityOtp.get());
-        entity.setWorkType(workTypeEntityOtp.get());
-        entity.setUser(new UserDetailEntity());
-        var newEntity = workingScheduleRepository.save(entity);
-        return new ScheduleUserDetailResponse(newEntity);
+    public ScheduleUserDetailResponse addScheduleForUser(ScheduleForUserForm scheduleForUserForm) throws DataNotFoundException, GeneralException {
+        try {
+            Optional<ShiftEntity> shiftEntityOtp = shiftRepository.findById(scheduleForUserForm.getShiftId());
+            if (!shiftEntityOtp.isPresent())
+                throw new DataNotFoundException("Shift ".concat(Messageutils.ITEM_NOT_EXITS));
+            Optional<WorkTypeEntity> workTypeEntityOtp = workTypeRepository.findById(scheduleForUserForm.getWorkTypeId());
+            if (!workTypeEntityOtp.isPresent())
+                throw new DataNotFoundException("Work Type ".concat(Messageutils.ITEM_NOT_EXITS));
+            WorkingScheduleEntity entity = new WorkingScheduleEntity(scheduleForUserForm);
+            entity.setShift(shiftEntityOtp.get());
+            entity.setWorkType(workTypeEntityOtp.get());
+            entity.setUser(new UserDetailEntity());
+            var newEntity = workingScheduleRepository.save(entity);
+            return new ScheduleUserDetailResponse(newEntity);
+        } catch (Exception ex) {
+            throw new GeneralException(ex.getMessage());
+        }
     }
 
     @Override
     public ScheduleUserDetailResponse updateScheduleForUser(ScheduleForUserForm scheduleForUserUpdateForm) throws DataNotFoundException, GeneralException {
-        if(!checkCanEditSchedule(DateUtils.parseStringToLocalDate(scheduleForUserUpdateForm.getWorkDate()))){
-            throw new GeneralException(Messageutils.SCHEDULE_CAN_NOT_EDIT);
+        try {
+            if (!checkCanEditSchedule(DateUtils.parseStringToLocalDate(scheduleForUserUpdateForm.getWorkDate()))) {
+                throw new GeneralException(Messageutils.SCHEDULE_CAN_NOT_EDIT);
+            }
+            Optional<WorkingScheduleEntity> workingScheduleEntityOtp = workingScheduleRepository.findById(scheduleForUserUpdateForm.getId());
+            if (!workingScheduleEntityOtp.isPresent())
+                throw new DataNotFoundException("Work Type ".concat(Messageutils.ITEM_NOT_EXITS));
+            return addScheduleForUser(scheduleForUserUpdateForm);
+        } catch (Exception ex) {
+            throw new GeneralException(ex.getMessage());
         }
-        Optional<WorkingScheduleEntity> workingScheduleEntityOtp = workingScheduleRepository.findById(scheduleForUserUpdateForm.getId());
-        if (!workingScheduleEntityOtp.isPresent()) throw new DataNotFoundException("Work Type ".concat(Messageutils.ITEM_NOT_EXITS));
-        return addScheduleForUser(scheduleForUserUpdateForm);
+    }
+
+    @Override
+    public List<WorkTypeEntity> getAllWorkType() throws GeneralException {
+        try {
+            return workTypeRepository.findAll();
+        } catch (Exception ex) {
+            throw new GeneralException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public List<ShiftEntity> getAllShift() throws GeneralException {
+        try {
+            return shiftRepository.findAll();
+        } catch (Exception ex) {
+            throw new GeneralException(ex.getMessage());
+        }
     }
 
     private ScheduleUserResponse mapWorkingScheduleToScheduleUserResponse(WorkingScheduleEntity item) {
