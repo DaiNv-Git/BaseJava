@@ -16,7 +16,7 @@ public class JwtUtils {
     private String jwtSecret;
 
     @Value("${jwt.duration}")
-    private int jwtExpirationMs;
+    private long jwtExpirationMs;
 
 
     public String generateJwtToken(UserDetailsImpl userPrincipal) {
@@ -24,16 +24,16 @@ public class JwtUtils {
     }
 
     public String generateTokenFromUsername(String username) {
-        // Generate web token json string from user id.
-        return Jwts.builder().setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + (jwtExpirationMs * 100000)))
-                .signWith(SignatureAlgorithm.HS256, jwtSecret)
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuer("duyepzai")
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 
     public String getUserNameFromJwtToken(String token) {
-        // Get user information from jwt
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
 
@@ -52,8 +52,6 @@ public class JwtUtils {
         } catch (IllegalArgumentException e) {
             logger.error("JWT claims string is empty: {}", e.getMessage());
         }
-
-
         return false;
     }
 

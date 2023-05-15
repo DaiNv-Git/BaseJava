@@ -1,16 +1,12 @@
 package MyProject.webapp.jwt;
 
-
-import MyProject.webapp.modle.entity.UserEntity;
+import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
+@Builder
 public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
 
@@ -22,41 +18,26 @@ public class UserDetailsImpl implements UserDetails {
 
     private String password;
 
-    private Boolean enabled ;
-
+    private Boolean enabled;
 
     private Collection<? extends GrantedAuthority> authorities;
-
-    public UserDetailsImpl(Long id, String name, String email, String password,
-                           Collection<? extends GrantedAuthority> authorities, Boolean isEnabled ) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.authorities = authorities;
-        this.enabled = isEnabled;
-
-    }
-    public static UserDetailsImpl build(UserEntity user) {
-        List<GrantedAuthority> authorities = getAuthoritiesForUser(user.getRole());
-        return new UserDetailsImpl(
-                user.getId(),
-                user.getFullName(),
-                user.getEmail(),
-                user.getPassword(),
-                authorities,
-                true);
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 
-    public Long getId() { return id; }
-    public String getName(){return name;}
-    public String getEmail(){return email;}
+    public Long getId() {
+        return id;
+    }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
 
 
     @Override
@@ -85,7 +66,9 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     @Override
-    public boolean isEnabled() {return true;}
+    public boolean isEnabled() {
+        return true;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -97,10 +80,4 @@ public class UserDetailsImpl implements UserDetails {
         return Objects.equals(id, user.id);
     }
 
-    private static List<GrantedAuthority> getAuthoritiesForUser(int isAdmin){
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        if(isAdmin == 2){authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));}
-        return authorities;
-    }
 }

@@ -1,11 +1,8 @@
 package MyProject.webapp.security;
 
 import MyProject.webapp.config.cors.CorsConfiguration;
-import MyProject.webapp.config.filter.JwtAuthenticationEntryPoint;
-import MyProject.webapp.config.filter.JwtAuthenticationFilter;
-import MyProject.webapp.jwt.AuthEntryPointJwt;
 import MyProject.webapp.jwt.AuthTokenFilter;
-import MyProject.webapp.service.UserDetailsServiceImpl;
+import MyProject.webapp.service.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,27 +24,21 @@ import javax.servlet.http.HttpServletResponse;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
     @Autowired
     private CorsConfiguration corsFilter;
 
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
-    @Autowired
-    private AuthEntryPointJwt unauthorizedHandler;
-
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
     }
-
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
     }
 
-    //Provide userservice and pasword encoder for spring security
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
@@ -56,6 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -72,15 +64,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/swagger-resources/**").permitAll()
                 .antMatchers("/login/**").permitAll()
                 .antMatchers("/refresh-token").permitAll()
-                .antMatchers("/admin/**").hasAnyRole("ROLE_ADMIN")
-                .antMatchers("/user/**").hasAnyRole("ROLE_USER", "ROLE_ADMIN")
+                .antMatchers("/api/admin/**").hasAnyRole("ROLE_ADMIN")
+                .antMatchers("/api/user/**").hasAnyRole("ROLE_USER", "ROLE_ADMIN")
                 .anyRequest().authenticated();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.httpBasic().authenticationEntryPoint(authenticationEntryPoint());
         http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
-        // Add a Filter class that checks for jwt
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(corsFilter, ChannelProcessingFilter.class);
+//        http.addFilterBefore(corsFilter, ChannelProcessingFilter.class);
     }
 
     @Override

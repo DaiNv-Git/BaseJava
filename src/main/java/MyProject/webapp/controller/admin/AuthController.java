@@ -1,4 +1,4 @@
-package MyProject.webapp.controller;
+package MyProject.webapp.controller.admin;
 
 import MyProject.webapp.jwt.AuthTokenFilter;
 import MyProject.webapp.jwt.JwtUtils;
@@ -25,14 +25,13 @@ import javax.validation.Valid;
 @RequestMapping("/login")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
 //    private final UserService userService;
     private final AuthTokenFilter authTokenFilter;
 
-    public AuthController(AuthenticationManager authenticationManager, PasswordEncoder encoder, JwtUtils jwtUtils, AuthTokenFilter authTokenFilter) {
+    public AuthController(AuthenticationManager authenticationManager,
+                           JwtUtils jwtUtils, AuthTokenFilter authTokenFilter) {
         this.authenticationManager = authenticationManager;
-        this.encoder = encoder;
         this.jwtUtils = jwtUtils;
         this.authTokenFilter = authTokenFilter;
     }

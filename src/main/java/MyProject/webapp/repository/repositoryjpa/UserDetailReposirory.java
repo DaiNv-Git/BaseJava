@@ -2,11 +2,16 @@ package MyProject.webapp.repository.repositoryjpa;
 
 import MyProject.webapp.modle.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface UserDetailReposirory extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmail(String email);
+
+    @Query(value = "select u from UserEntity u where :#{#username} IS NULL OR u.fullName LIKE %:#{#username}%")
+    List<UserEntity> findAll(String username);
 }

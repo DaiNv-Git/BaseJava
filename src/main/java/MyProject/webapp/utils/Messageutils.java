@@ -7,4 +7,8 @@ public class Messageutils {
     public static final String EMAIL_NOT_BLANK = "Email must not be empty.";
     public static final String PASSWORD_NOT_BLANK = "Password must not be empty.";
     public static final String INVALID_USERNAME_OR_PASSWORD = "Authentication failed. Please check your username and password.";
+    public static final String INVALID_TEL = "Invalid Phone Number, example: 0969686868 ";
+    public static final String CANNOT_BLANK = "Cannot Be Left Blank";
+    public static final String PASS_VALID_LENGHT = "Minimum length is 6 characters";
+    public static final String INVALID_FILE = "Invalid file";
 }

@@ -1,11 +1,18 @@
 package MyProject.webapp.modle.entity;
 
+import MyProject.webapp.modle.request.UserForm;
+import MyProject.webapp.utils.ConvertUtils;
+import MyProject.webapp.utils.DateUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -52,4 +59,26 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkingScheduleEntity> workingSchedules = new ArrayList<>();
+
+    public UserEntity(UserForm userRequest, PasswordEncoder encoder) throws IOException {
+        BeanUtils.copyProperties(userRequest, this);
+        setImage(userRequest.getImage());
+        setCreateAt();
+        setBirthDay(userRequest.getBirthDay());
+        this.password = encoder.encode(userRequest.getPassword());
+    }
+
+    public void setImage(MultipartFile file) throws IOException {
+        if (file != null) {
+            this.image = ConvertUtils.convertMultipartFileToByteArray(file);
+        }
+    }
+
+    public void setCreateAt() {
+        this.createAt = LocalDateTime.now();
+    }
+
+    public void setBirthDay(String birthDay) {
+        this.birthDay = DateUtils.parseStringToLocalDate(birthDay);
+    }
 }
