@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "User_Detail")
+@Table(name = "Users")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDetailEntity {
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
@@ -28,6 +28,8 @@ public class UserDetailEntity {
     private String tel;
     @Column(name = "Email", unique = true, nullable = false)
     private String email;
+    @Column(name = "password", nullable = false)
+    private String password;
     @Column(name = "Sex")
     private Integer sex;
     @Column(name = "Birth_Day")
@@ -39,9 +41,14 @@ public class UserDetailEntity {
     @Column(name = "Creator")
     private String creator;
     @Column(name = "role")
+    // 1 : ROLE_USER
+    // 2 : ROLE_ADMIN
     private Integer role;
+
     @Column(name = "image")
     private byte[] image;
+    @Column(name = "description")
+    private String description;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkingScheduleEntity> workingSchedules = new ArrayList<>();

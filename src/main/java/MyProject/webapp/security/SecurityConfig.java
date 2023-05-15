@@ -3,7 +3,9 @@ package MyProject.webapp.security;
 import MyProject.webapp.config.cors.CorsConfiguration;
 import MyProject.webapp.config.filter.JwtAuthenticationEntryPoint;
 import MyProject.webapp.config.filter.JwtAuthenticationFilter;
-import MyProject.webapp.service.AuthConfig;
+import MyProject.webapp.jwt.AuthEntryPointJwt;
+import MyProject.webapp.jwt.AuthTokenFilter;
+import MyProject.webapp.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,55 +16,70 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
+import javax.servlet.http.HttpServletResponse;
+
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    AuthConfig authConfig;
-    @Autowired
-    JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     @Autowired
     private CorsConfiguration corsFilter;
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(authConfig).passwordEncoder(passwordEncoder());
+    @Autowired
+    UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
-    @Override
     @Bean
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter();
+    }
+
+    //Provide userservice and pasword encoder for spring security
+    @Override
+    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    @Bean
+    @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Autowired
-    public JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable();
         http.authorizeRequests()
                 .antMatchers("/swagger-ui/**").permitAll()
-                .antMatchers("/api/**").permitAll()
-                .antMatchers("/user/**").permitAll()
                 .antMatchers("/v2/api-docs").permitAll()
                 .antMatchers("/webjars/**").permitAll()
                 .antMatchers("/swagger-resources/**").permitAll()
-                .antMatchers("/login").permitAll()
+                .antMatchers("/login/**").permitAll()
                 .antMatchers("/refresh-token").permitAll()
+                .antMatchers("/admin/**").hasAnyRole("ROLE_ADMIN")
+                .antMatchers("/user/**").hasAnyRole("ROLE_USER", "ROLE_ADMIN")
                 .anyRequest().authenticated();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.httpBasic().authenticationEntryPoint(authenticationEntryPoint());
+        http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
+        // Add a Filter class that checks for jwt
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(corsFilter, ChannelProcessingFilter.class);
     }
 

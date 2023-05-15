@@ -42,7 +42,7 @@ public class WorkingScheduleEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "User_Detail_ID")
-    private UserDetailEntity user;
+    private UserEntity user;
 
     public WorkingScheduleEntity(ScheduleForUserAddForm scheduleForUserAddForm) {
 

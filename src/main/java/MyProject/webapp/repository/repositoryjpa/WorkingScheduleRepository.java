@@ -1,6 +1,6 @@
 package MyProject.webapp.repository.repositoryjpa;
 
-import MyProject.webapp.modle.entity.UserDetailEntity;
+import MyProject.webapp.modle.entity.UserEntity;
 import MyProject.webapp.modle.entity.WorkingScheduleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,5 +12,5 @@ import java.util.List;
 public interface WorkingScheduleRepository extends JpaRepository<WorkingScheduleEntity, Long> {
     List<WorkingScheduleEntity> findByWorkDateBetween(LocalDate startDate, LocalDate endDate);
 
-    List<WorkingScheduleEntity> findByWorkDateBetweenAndUser(LocalDate startDate, LocalDate endDate, UserDetailEntity user);
+    List<WorkingScheduleEntity> findByWorkDateBetweenAndUser(LocalDate startDate, LocalDate endDate, UserEntity user);
 }

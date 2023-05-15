@@ -1,4 +1,4 @@
-package MyProject.webapp.controller;
+package MyProject.webapp.controller.user;
 
 import MyProject.webapp.exception.DataNotFoundException;
 import MyProject.webapp.exception.GeneralException;

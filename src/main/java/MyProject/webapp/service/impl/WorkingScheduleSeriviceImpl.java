@@ -3,7 +3,7 @@ package MyProject.webapp.service.impl;
 import MyProject.webapp.exception.DataNotFoundException;
 import MyProject.webapp.exception.GeneralException;
 import MyProject.webapp.modle.entity.ShiftEntity;
-import MyProject.webapp.modle.entity.UserDetailEntity;
+import MyProject.webapp.modle.entity.UserEntity;
 import MyProject.webapp.modle.entity.WorkTypeEntity;
 import MyProject.webapp.modle.entity.WorkingScheduleEntity;
 import MyProject.webapp.modle.request.ScheduleForUserAddForm;
@@ -50,7 +50,7 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
             LocalDate parsedStartDate = DateUtils.parseStringToLocalDate(startDate);
             LocalDate parsedEndDate = DateUtils.parseStringToLocalDate(endDate);
 
-            UserDetailEntity user = userDetailReposirory.findById(1L).get();
+            UserEntity user = userDetailReposirory.findById(1L).get();
             List<WorkingScheduleEntity> workingScheduleEntities = workingScheduleRepository.findByWorkDateBetweenAndUser(parsedStartDate, parsedEndDate, user);
             if (CollectionUtils.isEmpty(workingScheduleEntities)) return Collections.emptyList();
             return workingScheduleEntities.stream()

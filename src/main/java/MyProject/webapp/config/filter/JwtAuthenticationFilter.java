@@ -1,7 +1,8 @@
 package MyProject.webapp.config.filter;
 
-import MyProject.webapp.service.AuthConfig;
+import MyProject.webapp.service.UserDetailsServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtToken token;
     @Autowired
-    private AuthConfig authConfig;
+    private UserDetailsServiceImpl userDetailsServiceImpl;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -37,18 +38,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             // Lấy jwt từ request
             String authenticationHeader = getJwtFromRequest(request);
-            if (StringUtils.hasText(authenticationHeader) && token.validateToken(authenticationHeader)) {
-                // Lấy userLogin từ chuỗi jwt
-                String userLogin = token.getUserNameFromJWT(authenticationHeader);
-                // Lấy thông tin người dùng qua userLogin
-                UserDetails userDetails = authConfig.loadUserByUsername(userLogin);
-                if (userDetails != null) {
-                    // Nếu người dùng hợp lệ, set thông tin cho Seturity Context
-                    UsernamePasswordAuthenticationToken
-                            usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            if (!Strings.isNullOrEmpty(authenticationHeader)) {
+                if (StringUtils.hasText(authenticationHeader) && token.validateToken(authenticationHeader)) {
+                    // Lấy userLogin từ chuỗi jwt
+                    String userLogin = token.getUserNameFromJWT(authenticationHeader);
+                    // Lấy thông tin người dùng qua userLogin
+                    UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(userLogin);
+                    if (userDetails != null) {
+                        // Nếu người dùng hợp lệ, set thông tin cho Seturity Context
+                        UsernamePasswordAuthenticationToken
+                                usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                    }
                 }
+            } else {
+                filterChain.doFilter(request, response);
+                return;
             }
         } catch (Exception e) {
             log.error("Error logging in : {} " + e.getMessage());
@@ -63,11 +69,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        // Kiểm tra xem header Authorization có chứa thông tin jwt không
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+        String headerAuth = request.getHeader("Authorization");
+        // Check if Authorization header contains jwt information
+        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+            return headerAuth.substring(7, headerAuth.length());
         }
-        return "Authorization is not exit";
+        return null;
     }
 }
