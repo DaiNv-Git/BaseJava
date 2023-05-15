@@ -7,6 +7,7 @@ import MyProject.webapp.utils.Messageutils;
 import javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import java.security.GeneralSecurityException;
 
 @RestController
 @RequestMapping("/admin/user-manager")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class UserManagerController {
     private final UserService userService;
 
