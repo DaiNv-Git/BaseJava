@@ -10,6 +10,7 @@ import MyProject.webapp.modle.request.ScheduleForUserAddForm;
 import MyProject.webapp.modle.request.ScheduleForUserEditForm;
 import MyProject.webapp.modle.response.ShiftResponse;
 import MyProject.webapp.modle.response.WorkTypeResponse;
+import MyProject.webapp.modle.response.adminResponse.ScheduleAdminResponse;
 import MyProject.webapp.modle.response.schedule.ScheduleUserDetailResponse;
 import MyProject.webapp.modle.response.schedule.ScheduleUserResponse;
 import MyProject.webapp.repository.repositoryjpa.ShiftRepository;
@@ -20,14 +21,17 @@ import MyProject.webapp.service.WorkingScheduleSerivice;
 import MyProject.webapp.utils.ColorEnum;
 import MyProject.webapp.utils.DateUtils;
 import MyProject.webapp.utils.Messageutils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,12 +54,12 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
             LocalDate parsedStartDate = DateUtils.parseStringToLocalDate(startDate);
             LocalDate parsedEndDate = DateUtils.parseStringToLocalDate(endDate);
 
-            UserEntity user = userDetailReposirory.findById(1L).get();
+            UserEntity user = getCurrentUser();
             List<WorkingScheduleEntity> workingScheduleEntities = workingScheduleRepository.findByWorkDateBetweenAndUser(parsedStartDate, parsedEndDate, user);
             if (CollectionUtils.isEmpty(workingScheduleEntities)) return Collections.emptyList();
             return workingScheduleEntities.stream()
                     .filter(Objects::nonNull)
-                    .map(item -> mapWorkingScheduleToScheduleUserResponse(item))
+                    .map(this::mapWorkingScheduleToScheduleUserResponse)
                     .collect(Collectors.toList());
         } catch (Exception ex) {
             throw new GeneralException(ex.getMessage());
@@ -95,7 +99,7 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
             WorkingScheduleEntity entity = new WorkingScheduleEntity(scheduleForUserAddForm);
             entity.setShift(shiftEntityOtp.get());
             entity.setWorkType(workTypeEntityOtp.get());
-            entity.setUser(userDetailReposirory.findById(1L).get());
+            entity.setUser(getCurrentUser());
             var newEntity = workingScheduleRepository.save(entity);
             return new ScheduleUserDetailResponse(newEntity);
         } catch (Exception ex) {
@@ -121,7 +125,7 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
             WorkingScheduleEntity entity = new WorkingScheduleEntity(scheduleForUserUpdateForm);
             entity.setShift(shiftEntityOtp.get());
             entity.setWorkType(workTypeEntityOtp.get());
-            entity.setUser(userDetailReposirory.findById(1L).get());
+            entity.setUser(getCurrentUser());
             var newEntity = workingScheduleRepository.save(entity);
             return new ScheduleUserDetailResponse(newEntity);
         } catch (Exception ex) {
@@ -134,7 +138,7 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
         try {
             return workTypeRepository.findAll().stream()
                     .filter(Objects::nonNull)
-                    .map(i -> new WorkTypeResponse(i)).collect(Collectors.toList());
+                    .map(WorkTypeResponse::new).collect(Collectors.toList());
         } catch (Exception ex) {
             throw new GeneralException(ex.getMessage());
         }
@@ -150,6 +154,7 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
             throw new GeneralException(ex.getMessage());
         }
     }
+
 
     private ScheduleUserResponse mapWorkingScheduleToScheduleUserResponse(WorkingScheduleEntity item) {
         ScheduleUserResponse response = new ScheduleUserResponse();
@@ -167,4 +172,52 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
         LocalDate currentDate = LocalDate.now();
         return workDate.isAfter(currentDate);
     }
+
+
+//    logic retrurn response admin scre
+
+    @Override
+    public Page<ScheduleAdminResponse> getAllUsersWorkSchedule(int pageNumber, int pageSize, String startDate, String endDate, String employeeName) {
+        List<WorkingScheduleEntity> scheduleEntities = workingScheduleRepository.findWorkingSchedulesByDateAndFullName(
+                DateUtils.parseStringToLocalDate(startDate),
+                DateUtils.parseStringToLocalDate(endDate),
+                employeeName
+        );
+        if (CollectionUtils.isEmpty(scheduleEntities)) {
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(pageNumber, pageSize), 0);
+        }
+
+        Map<UserEntity, Map<LocalDate, List<WorkingScheduleEntity>>> userScheduleMap = scheduleEntities.stream()
+                .collect(Collectors.groupingBy(
+                        WorkingScheduleEntity::getUser,
+                        Collectors.groupingBy(WorkingScheduleEntity::getWorkDate)));
+        List<ScheduleAdminResponse> responses = new ArrayList<>();
+
+        for (UserEntity user : userScheduleMap.keySet()) {
+            ScheduleAdminResponse item = new ScheduleAdminResponse(user);
+            Map<LocalDate, List<WorkingScheduleEntity>> userDateMap = userScheduleMap.get(user);
+            for (LocalDate workDate : userDateMap.keySet()) {
+                int whatDay = DateUtils.getDayOfWeek(workDate);
+                List<WorkingScheduleEntity> userDateEvents = userDateMap.get(workDate);
+                for (WorkingScheduleEntity event : userDateEvents) {
+                    item.setScheduleData(whatDay, event);
+                }
+            }
+            responses.add(item);
+        }
+
+        int startIndex = pageNumber > 0 ? (pageNumber - 1) * pageSize : pageNumber * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, responses.size());
+        List<ScheduleAdminResponse> sublist = responses.subList(startIndex, endIndex);
+
+        return new PageImpl<>(sublist, PageRequest.of(pageNumber, pageSize), responses.size());
+    }
+
+    public UserEntity getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return userDetailReposirory.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(Messageutils.ITEM_NOT_EXITS));
+    }
+
 }

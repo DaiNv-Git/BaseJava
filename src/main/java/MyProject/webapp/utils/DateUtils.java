@@ -1,6 +1,7 @@
 package MyProject.webapp.utils;
 
 import java.lang.RuntimeException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -46,4 +47,9 @@ public class DateUtils {
         return localDate.concat(" ").concat(localTime);
     }
 
+    public static int getDayOfWeek(LocalDate workDate) {
+        DayOfWeek dayOfWeek = workDate.getDayOfWeek();
+        // Trả về giá trị từ 1 (Thứ Hai) đến 7 (Chủ Nhật)
+        return dayOfWeek.getValue();
+    }
 }

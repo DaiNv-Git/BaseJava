@@ -20,8 +20,11 @@ public class ScheduleManagerController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Object> getUserSchedule(@RequestParam String startDate,
-                                                  @RequestParam String endDate) throws GeneralException {
-        return ResponseEntity.ok(new BaseResponse<>(HttpStatus.OK.value(), Messageutils.SUCCESSFULLY, workingScheduleSerivice.getUserSchedule(startDate, endDate)));
+    public ResponseEntity<Object> getUserSchedule(@RequestParam(defaultValue = "1") int page,
+                                                  @RequestParam(defaultValue = "10") int size,
+                                                  @RequestParam String startDate,
+                                                  @RequestParam String endDate,
+                                                  @RequestParam (required = false) String employeeName) throws GeneralException {
+        return ResponseEntity.ok(new BaseResponse<>(HttpStatus.OK.value(), Messageutils.SUCCESSFULLY, workingScheduleSerivice.getAllUsersWorkSchedule(page, size, startDate, endDate, employeeName)));
     }
 }

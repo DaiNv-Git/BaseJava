@@ -36,7 +36,7 @@ public class AuthController {
         this.authTokenFilter = authTokenFilter;
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<BaseResponse<Object>> user(@Valid @RequestBody AuthLogin loginRequest) {
         try {
             // Authenticate from username and password.
