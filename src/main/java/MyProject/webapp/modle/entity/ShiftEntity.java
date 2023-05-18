@@ -18,6 +18,7 @@ public class ShiftEntity {
     private String name;
 
     @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Transient
     private List<WorkingScheduleEntity> workingSchedules = new ArrayList<>();
 
 }

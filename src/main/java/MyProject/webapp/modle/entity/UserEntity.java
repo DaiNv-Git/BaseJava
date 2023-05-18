@@ -3,6 +3,7 @@ package MyProject.webapp.modle.entity;
 import MyProject.webapp.modle.request.UserForm;
 import MyProject.webapp.utils.ConvertUtils;
 import MyProject.webapp.utils.DateUtils;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -58,6 +59,7 @@ public class UserEntity {
     private String description;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Transient
     private List<WorkingScheduleEntity> workingSchedules = new ArrayList<>();
 
     public UserEntity(UserForm userRequest, PasswordEncoder encoder) throws IOException {

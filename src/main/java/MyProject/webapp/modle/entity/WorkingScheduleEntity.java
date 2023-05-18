@@ -32,15 +32,15 @@ public class WorkingScheduleEntity {
     @Column(name = "Description")
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "Shift_ID")
     private ShiftEntity shift;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "Work_Type_ID")
     private WorkTypeEntity workType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "User_Detail_ID")
     private UserEntity user;
 
