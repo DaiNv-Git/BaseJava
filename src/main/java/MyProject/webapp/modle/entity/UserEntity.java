@@ -62,12 +62,11 @@ public class UserEntity {
     @Transient
     private List<WorkingScheduleEntity> workingSchedules = new ArrayList<>();
 
-    public UserEntity(UserForm userRequest, PasswordEncoder encoder) throws IOException {
+    public UserEntity(UserForm userRequest) throws IOException {
         BeanUtils.copyProperties(userRequest, this);
         setImage(userRequest.getImage());
         setCreateAt();
         setBirthDay(userRequest.getBirthDay());
-        this.password = encoder.encode(userRequest.getPassword());
     }
 
     public void setImage(MultipartFile file) throws IOException {

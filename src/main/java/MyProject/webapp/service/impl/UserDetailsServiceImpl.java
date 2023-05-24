@@ -1,7 +1,9 @@
 package MyProject.webapp.service.impl;
 
+import MyProject.webapp.exception.GeneralException;
 import MyProject.webapp.jwt.UserDetailsImpl;
 import MyProject.webapp.modle.entity.UserEntity;
+import MyProject.webapp.modle.request.ChangePasswordForm;
 import MyProject.webapp.modle.request.UserForm;
 import MyProject.webapp.modle.response.UserDetailResponse;
 import MyProject.webapp.repository.repositoryjpa.UserDetailReposirory;
@@ -66,7 +68,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
     @Override
     public UserDetailResponse addNewUser(UserForm userRequest) throws GeneralSecurityException {
         try {
-            UserEntity userIn = new UserEntity(userRequest, encoder);
+            UserEntity userIn = new UserEntity(userRequest);
             var newUser = userRepository.save(userIn);
             return new UserDetailResponse(newUser);
         } catch (Exception ex) {
@@ -112,9 +114,25 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
-    public List<UserDetailResponse> getAllUser(String username) {
-        List<UserEntity> userEntities = userRepository.findAll(username);
+    public List<UserDetailResponse> getAllUser(String email) {
+        List<UserEntity> userEntities = userRepository.findAll(email);
         if (CollectionUtils.isEmpty(userEntities)) return Collections.emptyList();
-        return userEntities.stream().map(item -> new UserDetailResponse(item)).collect(Collectors.toList());
+        return userEntities.stream().map(UserDetailResponse::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public UserDetailResponse changePasswordUser(Long userId, ChangePasswordForm changePasswordForm) throws NotFoundException, GeneralException {
+        var userOtp = userRepository.findById(userId);
+        if (!userOtp.isPresent()) {
+            throw new NotFoundException(Messageutils.ITEM_NOT_EXITS);
+        }
+        var user = userOtp.get();
+        String newPassEncoder = encoder.encode(changePasswordForm.getNewPassword());
+        if (!encoder.matches(user.getPassword(), newPassEncoder)) {
+            throw new GeneralException("The old password you entered is incorrect");
+        }
+        user.setPassword(newPassEncoder);
+        userRepository.save(user);
+        return detail(userId);
     }
 }

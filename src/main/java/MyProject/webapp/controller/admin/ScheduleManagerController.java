@@ -6,11 +6,13 @@ import MyProject.webapp.service.WorkingScheduleSerivice;
 import MyProject.webapp.utils.Messageutils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController("/admin/working-schedule")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class ScheduleManagerController {
 
     private final WorkingScheduleSerivice workingScheduleSerivice;

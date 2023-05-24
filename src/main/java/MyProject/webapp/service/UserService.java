@@ -1,5 +1,7 @@
 package MyProject.webapp.service;
 
+import MyProject.webapp.exception.GeneralException;
+import MyProject.webapp.modle.request.ChangePasswordForm;
 import MyProject.webapp.modle.request.UserForm;
 import MyProject.webapp.modle.response.UserDetailResponse;
 import javassist.NotFoundException;
@@ -16,5 +18,7 @@ public interface UserService {
 
     UserDetailResponse editUser(Long userId, UserForm userRequest) throws GeneralSecurityException;
 
-    List<UserDetailResponse> getAllUser(String username);
+    List<UserDetailResponse> getAllUser(String email);
+
+    UserDetailResponse changePasswordUser(Long userId, ChangePasswordForm changePasswordForm) throws NotFoundException, GeneralException;
 }

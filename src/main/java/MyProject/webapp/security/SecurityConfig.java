@@ -66,6 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/swagger-resources/**").permitAll()
                 .antMatchers("/login/**").permitAll()
                 .antMatchers("/refresh-token").permitAll()
+                .antMatchers("/refresh-token").permitAll()
                 .anyRequest().authenticated();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.httpBasic().authenticationEntryPoint(authenticationEntryPoint());
