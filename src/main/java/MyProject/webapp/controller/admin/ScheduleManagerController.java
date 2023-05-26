@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/admin/working-schedule")
+@RestController("/admin")
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class ScheduleManagerController {
 
@@ -21,7 +21,7 @@ public class ScheduleManagerController {
         this.workingScheduleSerivice = workingScheduleSerivice;
     }
 
-    @GetMapping("/")
+    @GetMapping("/working-schedule")
     public ResponseEntity<Object> getUserSchedule(@RequestParam(defaultValue = "1") int page,
                                                   @RequestParam(defaultValue = "10") int size,
                                                   @RequestParam String startDate,

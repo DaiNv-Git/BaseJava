@@ -1,4 +1,5 @@
 package MyProject.webapp.modle.response.schedule;
+import MyProject.webapp.exception.GeneralException;
 import MyProject.webapp.modle.entity.WorkingScheduleEntity;
 import MyProject.webapp.utils.DateUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,14 +28,14 @@ public class ScheduleUserDetailResponse {
     @JsonProperty(value = "workTypeId")
     private Long workTypeId;
 
-    public ScheduleUserDetailResponse(WorkingScheduleEntity workingScheduleEntity) {
+    public ScheduleUserDetailResponse(WorkingScheduleEntity workingScheduleEntity) throws GeneralException {
         this.id = workingScheduleEntity.getId();
         this.title = workingScheduleEntity.getWorkTitle();
         this.workDate = DateUtils.parseLocalDateToString(workingScheduleEntity.getWorkDate());
         this.startTime = DateUtils.parseLocalTimeToString(workingScheduleEntity.getStartTime());
         this.endTime = DateUtils.parseLocalTimeToString(workingScheduleEntity.getEndTime());
         this.description = workingScheduleEntity.getDescription();
-        this.shiftId = workingScheduleEntity.getShift()==null ? null : workingScheduleEntity.getShift().getId();
-        this.workTypeId = workingScheduleEntity.getWorkType()==null ? null : workingScheduleEntity.getWorkType().getId();
+        this.shiftId = workingScheduleEntity.getShift() == null ? null : workingScheduleEntity.getShift().getId();
+        this.workTypeId = workingScheduleEntity.getWorkType() == null ? null : workingScheduleEntity.getWorkType().getId();
     }
 }

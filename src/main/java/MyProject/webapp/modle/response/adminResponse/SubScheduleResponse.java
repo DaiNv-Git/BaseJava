@@ -1,5 +1,6 @@
 package MyProject.webapp.modle.response.adminResponse;
 
+import MyProject.webapp.exception.GeneralException;
 import MyProject.webapp.modle.entity.WorkingScheduleEntity;
 import MyProject.webapp.utils.DateUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,7 +21,7 @@ public class SubScheduleResponse {
     @JsonProperty(value = "shiftName")
     private String shiftName;
 
-    public SubScheduleResponse(WorkingScheduleEntity event) {
+    public SubScheduleResponse(WorkingScheduleEntity event) throws GeneralException {
         this.scheduleId = event.getId();
         this.startTime = DateUtils.parseLocalTimeToString(event.getStartTime());
         this.endTime = DateUtils.parseLocalTimeToString(event.getEndTime());

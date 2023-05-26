@@ -4,7 +4,7 @@ import MyProject.webapp.jwt.JwtUtils;
 import MyProject.webapp.jwt.UserDetailsImpl;
 import MyProject.webapp.modle.request.AuthLogin;
 import MyProject.webapp.modle.response.BaseResponse;
-import MyProject.webapp.response.AuthResponse;
+import MyProject.webapp.modle.response.AuthResponse;
 import MyProject.webapp.utils.Messageutils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

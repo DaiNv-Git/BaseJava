@@ -59,7 +59,13 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
             if (CollectionUtils.isEmpty(workingScheduleEntities)) return Collections.emptyList();
             return workingScheduleEntities.stream()
                     .filter(Objects::nonNull)
-                    .map(this::mapWorkingScheduleToScheduleUserResponse)
+                    .map(i -> {
+                        try {
+                            return mapWorkingScheduleToScheduleUserResponse(i);
+                        } catch (GeneralException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
                     .collect(Collectors.toList());
         } catch (Exception ex) {
             throw new GeneralException(ex.getMessage());
@@ -149,23 +155,27 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
         try {
             return shiftRepository.findAll().stream()
                     .filter(Objects::nonNull)
-                    .map(i -> new ShiftResponse(i)).collect(Collectors.toList());
+                    .map(ShiftResponse::new).collect(Collectors.toList());
         } catch (Exception ex) {
             throw new GeneralException(ex.getMessage());
         }
     }
 
 
-    private ScheduleUserResponse mapWorkingScheduleToScheduleUserResponse(WorkingScheduleEntity item) {
-        ScheduleUserResponse response = new ScheduleUserResponse();
-        response.setId(item.getId());
-        response.setTitle(item.getWorkTitle());
-        response.setStartDate(DateUtils.concatLocalDateToLocalTime(item.getWorkDate(), item.getStartTime()));
-        response.setEndDate(DateUtils.concatLocalDateToLocalTime(item.getWorkDate(), item.getEndTime()));
-        response.setColor(ColorEnum.getColorById(item.getShift().getId()));
-        response.setTimed(true);
-        response.setCanEdit(checkCanEditSchedule(item.getWorkDate()));
-        return response;
+    private ScheduleUserResponse mapWorkingScheduleToScheduleUserResponse(WorkingScheduleEntity item) throws GeneralException {
+        try {
+            ScheduleUserResponse response = new ScheduleUserResponse();
+            response.setId(item.getId());
+            response.setTitle(item.getWorkTitle());
+            response.setStartDate(DateUtils.concatLocalDateToLocalTime(item.getWorkDate(), item.getStartTime()));
+            response.setEndDate(DateUtils.concatLocalDateToLocalTime(item.getWorkDate(), item.getEndTime()));
+            response.setColor(ColorEnum.getColorById(item.getShift().getId()));
+            response.setTimed(true);
+            response.setCanEdit(checkCanEditSchedule(item.getWorkDate()));
+            return response;
+        }catch (Exception ex){
+            return null;
+        }
     }
 
     private boolean checkCanEditSchedule(LocalDate workDate) {
@@ -177,7 +187,7 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
 //    logic retrurn response admin scre
 
     @Override
-    public Page<ScheduleAdminResponse> getAllUsersWorkSchedule(int pageNumber, int pageSize, String startDate, String endDate, String employeeName) {
+    public Page<ScheduleAdminResponse> getAllUsersWorkSchedule(int pageNumber, int pageSize, String startDate, String endDate, String employeeName) throws GeneralException {
         List<WorkingScheduleEntity> scheduleEntities = workingScheduleRepository.findWorkingSchedulesByDateAndFullName(
                 DateUtils.parseStringToLocalDate(startDate),
                 DateUtils.parseStringToLocalDate(endDate),
@@ -193,12 +203,14 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
                         Collectors.groupingBy(WorkingScheduleEntity::getWorkDate)));
         List<ScheduleAdminResponse> responses = new ArrayList<>();
 
-        for (UserEntity user : userScheduleMap.keySet()) {
+        for (Map.Entry<UserEntity, Map<LocalDate, List<WorkingScheduleEntity>>> userEntry : userScheduleMap.entrySet()) {
+            UserEntity user = userEntry.getKey();
             ScheduleAdminResponse item = new ScheduleAdminResponse(user);
-            Map<LocalDate, List<WorkingScheduleEntity>> userDateMap = userScheduleMap.get(user);
-            for (LocalDate workDate : userDateMap.keySet()) {
+            Map<LocalDate, List<WorkingScheduleEntity>> userDateMap = userEntry.getValue();
+            for (Map.Entry<LocalDate, List<WorkingScheduleEntity>> dateEntry : userDateMap.entrySet()) {
+                LocalDate workDate = dateEntry.getKey();
                 int whatDay = DateUtils.getDayOfWeek(workDate);
-                List<WorkingScheduleEntity> userDateEvents = userDateMap.get(workDate);
+                List<WorkingScheduleEntity> userDateEvents = dateEntry.getValue();
                 for (WorkingScheduleEntity event : userDateEvents) {
                     item.setScheduleData(whatDay, event);
                 }

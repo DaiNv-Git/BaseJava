@@ -1,6 +1,7 @@
 package MyProject.webapp.utils;
 
-import java.lang.RuntimeException;
+import MyProject.webapp.exception.GeneralException;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -8,40 +9,40 @@ import java.time.format.DateTimeFormatter;
 
 public class DateUtils {
 
-    public static LocalDate parseStringToLocalDate(String inputDate) throws RuntimeException {
+    public static LocalDate parseStringToLocalDate(String inputDate) throws GeneralException {
         try {
             return LocalDate.parse(inputDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         }catch (Exception ex){
-            throw new RuntimeException(ex.getMessage());
+            throw new GeneralException(ex.getMessage());
         }
     }
-    public static LocalTime parseStringToLocalTime(String timeString) throws RuntimeException {
+    public static LocalTime parseStringToLocalTime(String timeString) throws GeneralException {
         try {
             return LocalTime.parse(timeString);
         }catch (Exception ex){
-            throw new RuntimeException(ex.getMessage());
+            throw new GeneralException(ex.getMessage());
         }
     }
 
-    public static String parseLocalDateToString(LocalDate localDate) throws RuntimeException {
+    public static String parseLocalDateToString(LocalDate localDate) throws GeneralException {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             return localDate.format(formatter);
         }catch (Exception ex){
-            throw new RuntimeException(ex.getMessage());
+            throw new GeneralException(ex.getMessage());
         }
     }
 
-    public static String parseLocalTimeToString(LocalTime localTime) throws RuntimeException {
+    public static String parseLocalTimeToString(LocalTime localTime) throws GeneralException {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
             return localTime.format(formatter);
         }catch (Exception ex){
-            throw new RuntimeException(ex.getMessage());
+            throw new GeneralException(ex.getMessage());
         }
     }
 
-    public static String concatLocalDateToLocalTime(LocalDate localDateIn, LocalTime localTimeIn) throws RuntimeException {
+    public static String concatLocalDateToLocalTime(LocalDate localDateIn, LocalTime localTimeIn) throws GeneralException {
         String localDate = parseLocalDateToString(localDateIn);
         String localTime = parseLocalTimeToString(localTimeIn);
         return localDate.concat(" ").concat(localTime);

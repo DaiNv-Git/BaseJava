@@ -1,15 +1,14 @@
 package MyProject.webapp.modle.entity;
 
+import MyProject.webapp.exception.GeneralException;
 import MyProject.webapp.modle.request.UserForm;
 import MyProject.webapp.utils.ConvertUtils;
 import MyProject.webapp.utils.DateUtils;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
@@ -62,14 +61,14 @@ public class UserEntity {
     @Transient
     private List<WorkingScheduleEntity> workingSchedules = new ArrayList<>();
 
-    public UserEntity(UserForm userRequest) throws IOException {
+    public UserEntity(UserForm userRequest) throws IOException, GeneralException {
         BeanUtils.copyProperties(userRequest, this);
         setImage(userRequest.getImage());
         setCreateAt();
         setBirthDay(userRequest.getBirthDay());
     }
 
-    public void setImage(MultipartFile file) throws IOException {
+    public void setImage(MultipartFile file) throws IOException, GeneralException {
         if (file != null) {
             this.image = ConvertUtils.convertMultipartFileToByteArray(file);
         }
@@ -79,7 +78,7 @@ public class UserEntity {
         this.createAt = LocalDateTime.now();
     }
 
-    public void setBirthDay(String birthDay) {
+    public void setBirthDay(String birthDay) throws GeneralException {
         this.birthDay = DateUtils.parseStringToLocalDate(birthDay);
     }
 }

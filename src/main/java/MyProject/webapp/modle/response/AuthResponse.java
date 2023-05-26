@@ -1,4 +1,4 @@
-package MyProject.webapp.response;
+package MyProject.webapp.modle.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

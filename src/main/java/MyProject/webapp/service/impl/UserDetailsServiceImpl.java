@@ -69,6 +69,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
     public UserDetailResponse addNewUser(UserForm userRequest) throws GeneralSecurityException {
         try {
             UserEntity userIn = new UserEntity(userRequest);
+            userIn.setPassword(encoder.encode(userRequest.getPassword()));
             var newUser = userRepository.save(userIn);
             return new UserDetailResponse(newUser);
         } catch (Exception ex) {
@@ -77,7 +78,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
-    public UserDetailResponse detail(Long userId) throws NotFoundException {
+    public UserDetailResponse detail(Long userId) throws NotFoundException, GeneralException {
         var userOtp = userRepository.findById(userId);
         if (userOtp.isPresent()) {
             return new UserDetailResponse(userOtp.get());
@@ -106,6 +107,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
             userUpdate.setImage(userRequest.getImage());
             userUpdate.setCreateAt();
             userUpdate.setBirthDay(userRequest.getBirthDay());
+            userUpdate.setPassword(encoder.encode(userRequest.getPassword()));
 
             return new UserDetailResponse(userRepository.save(userUpdate));
         } catch (Exception ex) {
@@ -117,7 +119,13 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
     public List<UserDetailResponse> getAllUser(String email) {
         List<UserEntity> userEntities = userRepository.findAll(email);
         if (CollectionUtils.isEmpty(userEntities)) return Collections.emptyList();
-        return userEntities.stream().map(UserDetailResponse::new).collect(Collectors.toList());
+        return userEntities.stream().map(i -> {
+            try {
+                return new UserDetailResponse(i);
+            } catch (GeneralException e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
     }
 
     @Override

@@ -5,14 +5,15 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class ConvertUtils {
 
-    public static byte[] convertMultipartFileToByteArray(MultipartFile file) throws IOException {
-        if (file.isEmpty() || file == null) {
-            return null;
+    public static byte[] convertMultipartFileToByteArray(MultipartFile file) throws IOException, GeneralException {
+        if (file == null || file.isEmpty()) {
+            return new byte[0];
         }
-        if (!isValidImageFile(file)) new GeneralException(Messageutils.INVALID_FILE);
+        if (!isValidImageFile(file)) throw new GeneralException(Messageutils.INVALID_FILE);
         return file.getBytes();
     }
 
@@ -22,7 +23,7 @@ public class ConvertUtils {
         if (contentType == null || !contentType.startsWith("image/")) {
             return false;
         }
-        String filename = StringUtils.cleanPath(file.getOriginalFilename());
+        String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         if (filename.contains("..")) {
             return false;
         }

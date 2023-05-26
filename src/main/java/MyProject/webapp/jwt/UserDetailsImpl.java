@@ -3,6 +3,7 @@ package MyProject.webapp.jwt;
 import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.Objects;
 
@@ -35,11 +36,6 @@ public class UserDetailsImpl implements UserDetails {
         return name;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-
     @Override
     public String getPassword() {
         return password;
@@ -71,13 +67,18 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
+    public boolean equals(Object obj) {
+        if (this == obj)
             return true;
-        if (o == null || getClass() != o.getClass())
+        if (obj == null || getClass() != obj.getClass())
             return false;
-        UserDetailsImpl user = (UserDetailsImpl) o;
+        UserDetailsImpl user = (UserDetailsImpl) obj;
         return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
 }

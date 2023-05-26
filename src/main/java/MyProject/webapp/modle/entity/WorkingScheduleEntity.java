@@ -1,5 +1,6 @@
 package MyProject.webapp.modle.entity;
 
+import MyProject.webapp.exception.GeneralException;
 import MyProject.webapp.modle.request.ScheduleForUserAddForm;
 import MyProject.webapp.modle.request.ScheduleForUserEditForm;
 import MyProject.webapp.utils.DateUtils;
@@ -44,7 +45,7 @@ public class WorkingScheduleEntity {
     @JoinColumn(name = "User_Detail_ID")
     private UserEntity user;
 
-    public WorkingScheduleEntity(ScheduleForUserAddForm scheduleForUserAddForm) {
+    public WorkingScheduleEntity(ScheduleForUserAddForm scheduleForUserAddForm) throws GeneralException {
 
         this.workTitle = scheduleForUserAddForm.getTitle();
         this.workDate = DateUtils.parseStringToLocalDate(scheduleForUserAddForm.getWorkDate());
@@ -53,7 +54,7 @@ public class WorkingScheduleEntity {
         this.description = scheduleForUserAddForm.getDescription();
     }
 
-    public WorkingScheduleEntity(ScheduleForUserEditForm scheduleForUserEditForm) {
+    public WorkingScheduleEntity(ScheduleForUserEditForm scheduleForUserEditForm) throws GeneralException {
         this.id = scheduleForUserEditForm.getId();
         this.workTitle = scheduleForUserEditForm.getTitle();
         this.workDate = DateUtils.parseStringToLocalDate(scheduleForUserEditForm.getWorkDate());

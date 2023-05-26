@@ -24,7 +24,7 @@ public enum ColorEnum {
 
     public static String getColorById(Long id) {
         for (ColorEnum colorEnum : ColorEnum.values()) {
-            if (colorEnum.getId() == id) {
+            if (colorEnum.getId().equals(id)) {
                 return colorEnum.getColor();
             }
         }

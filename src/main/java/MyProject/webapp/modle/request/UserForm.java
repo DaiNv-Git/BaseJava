@@ -28,6 +28,11 @@ public class UserForm {
     @ApiModelProperty(value = "abcd@gmail.com", example = "abcd@gmail.com", required = true)
     private String email;
 
+    @JsonProperty(value = "password")
+    @NotBlank(message = Messageutils.CANNOT_BLANK)
+    @ApiModelProperty(value = "abd31071", example = "abd123", required = true)
+    private String password;
+
     @NotNull(message=Messageutils.CANNOT_BLANK)
     @ApiModelProperty(value = "Giới tính (0: Nam, 1: Nữ)", example = "0", required = true)
     @JsonProperty(value = "sex")

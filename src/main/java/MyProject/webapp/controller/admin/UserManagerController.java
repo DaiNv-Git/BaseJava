@@ -35,7 +35,7 @@ public class UserManagerController {
     }
 
     @GetMapping("/detail/{userId}")
-    public ResponseEntity<Object> detail(@PathVariable("userId") Long userId) throws NotFoundException {
+    public ResponseEntity<Object> detail(@PathVariable("userId") Long userId) throws NotFoundException, GeneralException {
         return ResponseEntity.ok(new BaseResponse<>(HttpStatus.OK.value(), Messageutils.SUCCESSFULLY, userService.detail(userId)));
     }
 

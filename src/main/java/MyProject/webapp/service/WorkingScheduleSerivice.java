@@ -28,5 +28,5 @@ public interface WorkingScheduleSerivice {
 
     List<ShiftResponse> getAllShift() throws GeneralException;
 
-    Page<ScheduleAdminResponse> getAllUsersWorkSchedule(int page, int size, String startDate, String endDate, String employeeName);
+    Page<ScheduleAdminResponse> getAllUsersWorkSchedule(int page, int size, String startDate, String endDate, String employeeName) throws GeneralException;
 }

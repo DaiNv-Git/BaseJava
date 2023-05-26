@@ -1,8 +1,8 @@
 package MyProject.webapp.modle.response.adminResponse;
 
+import MyProject.webapp.exception.GeneralException;
 import MyProject.webapp.modle.entity.UserEntity;
 import MyProject.webapp.modle.entity.WorkingScheduleEntity;
-import MyProject.webapp.modle.response.schedule.ScheduleUserResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,7 +43,7 @@ public class ScheduleAdminResponse {
     }
 
     // whatDay:  giá trị từ 1 (Thứ Hai) đến 7 (Chủ Nhật)
-    public void setScheduleData(int whatDay, WorkingScheduleEntity event) {
+    public void setScheduleData(int whatDay, WorkingScheduleEntity event) throws GeneralException {
         switch (whatDay) {
             case 1:
                 this.monday.add(new SubScheduleResponse(event));

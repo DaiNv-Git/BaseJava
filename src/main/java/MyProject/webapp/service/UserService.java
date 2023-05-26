@@ -12,7 +12,7 @@ import java.util.List;
 public interface UserService {
     UserDetailResponse addNewUser(UserForm userRequest) throws GeneralSecurityException;
 
-    UserDetailResponse detail(Long userId) throws NotFoundException;
+    UserDetailResponse detail(Long userId) throws NotFoundException, GeneralException;
 
     void deleteUser(Long userId) throws GeneralSecurityException;
 

@@ -1,5 +1,6 @@
 package MyProject.webapp.modle.response;
 
+import MyProject.webapp.exception.GeneralException;
 import MyProject.webapp.modle.entity.UserEntity;
 import MyProject.webapp.utils.DateUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -32,7 +33,7 @@ public class UserDetailResponse {
     @JsonProperty(value = "description")
     private String description;
 
-    public UserDetailResponse(UserEntity user) {
+    public UserDetailResponse(UserEntity user) throws GeneralException {
         BeanUtils.copyProperties(user, this);
         this.image = user.getImage() == null ? null :  user.getImage();
         this.birthDay = DateUtils.parseLocalDateToString(user.getBirthDay());
