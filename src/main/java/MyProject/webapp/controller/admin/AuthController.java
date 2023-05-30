@@ -39,7 +39,7 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
             String token = jwtUtils.generateJwtToken(userDetails);
-            return ResponseEntity.status(HttpStatus.OK).body(new BaseResponse<>(HttpStatus.OK.value(), Messageutils.SUCCESSFULLY, new AuthResponse(token, null)));
+            return ResponseEntity.status(HttpStatus.OK).body(new BaseResponse<>(HttpStatus.OK.value(), Messageutils.SUCCESSFULLY, new AuthResponse(token, null,userDetails)));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }

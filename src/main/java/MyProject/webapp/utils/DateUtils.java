@@ -11,10 +11,14 @@ public class DateUtils {
 
     public static LocalDate parseStringToLocalDate(String inputDate) throws GeneralException {
         try {
-            return LocalDate.parse(inputDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            return LocalDate.parse(inputDate, checkFormatInputDate(inputDate));
         }catch (Exception ex){
             throw new GeneralException(ex.getMessage());
         }
+    }
+    public static DateTimeFormatter checkFormatInputDate(String date){
+        if (date.contains("-")) return DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return DateTimeFormatter.ofPattern("dd/MM/yyyy");
     }
     public static LocalTime parseStringToLocalTime(String timeString) throws GeneralException {
         try {

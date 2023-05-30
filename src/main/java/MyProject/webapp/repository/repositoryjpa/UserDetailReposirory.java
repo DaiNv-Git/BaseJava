@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface UserDetailReposirory extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmail(String email);
 
-    @Query(value = "select u from UserEntity u where :#{#username} IS NULL OR u.email LIKE %:#{#email}%")
+    @Query(value = "select u from UserEntity u where :#{#email} IS NULL OR u.email LIKE %:#{#email}%")
     List<UserEntity> findAll(String email);
 }
