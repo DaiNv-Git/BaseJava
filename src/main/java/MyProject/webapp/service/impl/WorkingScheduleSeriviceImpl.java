@@ -96,6 +96,11 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
     @Override
     public ScheduleUserDetailResponse addScheduleForUser(ScheduleForUserAddForm scheduleForUserAddForm) throws DataNotFoundException, GeneralException {
         try {
+            UserEntity userLogin = getCurrentUser();
+            if (!checkCanEditSchedule(DateUtils.parseStringToLocalDate(scheduleForUserAddForm.getWorkDate()))
+                    && userLogin.getRole().equals(1)) {
+                throw new GeneralException(Messageutils.SCHEDULE_CAN_NOT_EDIT);
+            }
             Optional<ShiftEntity> shiftEntityOtp = shiftRepository.findById(scheduleForUserAddForm.getShiftId());
             if (!shiftEntityOtp.isPresent())
                 throw new DataNotFoundException("Shift ".concat(Messageutils.ITEM_NOT_EXITS));
@@ -105,7 +110,7 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
             WorkingScheduleEntity entity = new WorkingScheduleEntity(scheduleForUserAddForm);
             entity.setShift(shiftEntityOtp.get());
             entity.setWorkType(workTypeEntityOtp.get());
-            entity.setUser(getCurrentUser());
+            entity.setUser(userLogin);
             var newEntity = workingScheduleRepository.save(entity);
             return new ScheduleUserDetailResponse(newEntity);
         } catch (Exception ex) {
@@ -116,7 +121,9 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
     @Override
     public ScheduleUserDetailResponse updateScheduleForUser(ScheduleForUserEditForm scheduleForUserUpdateForm) throws DataNotFoundException, GeneralException {
         try {
-            if (!checkCanEditSchedule(DateUtils.parseStringToLocalDate(scheduleForUserUpdateForm.getWorkDate()))) {
+            UserEntity userLogin = getCurrentUser();
+            if (!checkCanEditSchedule(DateUtils.parseStringToLocalDate(scheduleForUserUpdateForm.getWorkDate()))
+            && userLogin.getRole().equals(1)) {
                 throw new GeneralException(Messageutils.SCHEDULE_CAN_NOT_EDIT);
             }
             Optional<WorkingScheduleEntity> workingScheduleEntityOtp = workingScheduleRepository.findById(scheduleForUserUpdateForm.getId());
@@ -131,7 +138,7 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
             WorkingScheduleEntity entity = new WorkingScheduleEntity(scheduleForUserUpdateForm);
             entity.setShift(shiftEntityOtp.get());
             entity.setWorkType(workTypeEntityOtp.get());
-            entity.setUser(getCurrentUser());
+            entity.setUser(userLogin);
             var newEntity = workingScheduleRepository.save(entity);
             return new ScheduleUserDetailResponse(newEntity);
         } catch (Exception ex) {
