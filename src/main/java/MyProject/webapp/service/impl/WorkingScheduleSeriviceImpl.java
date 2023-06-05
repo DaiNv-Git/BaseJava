@@ -138,7 +138,7 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
             WorkingScheduleEntity entity = new WorkingScheduleEntity(scheduleForUserUpdateForm);
             entity.setShift(shiftEntityOtp.get());
             entity.setWorkType(workTypeEntityOtp.get());
-            entity.setUser(userLogin);
+            entity.setUser(workingScheduleEntityOtp.get().getUser());
             var newEntity = workingScheduleRepository.save(entity);
             return new ScheduleUserDetailResponse(newEntity);
         } catch (Exception ex) {
@@ -176,7 +176,7 @@ public class WorkingScheduleSeriviceImpl implements WorkingScheduleSerivice {
             response.setTitle(item.getWorkTitle());
             response.setStartDate(DateUtils.concatLocalDateToLocalTime(item.getWorkDate(), item.getStartTime()));
             response.setEndDate(DateUtils.concatLocalDateToLocalTime(item.getWorkDate(), item.getEndTime()));
-            response.setColor(ColorEnum.getColorById(item.getShift().getId()));
+            response.setColor(ColorEnum.getColorById(item.getWorkType().getId()));
             response.setTimed(true);
             response.setCanEdit(checkCanEditSchedule(item.getWorkDate()));
             return response;
