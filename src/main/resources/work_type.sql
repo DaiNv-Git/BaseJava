@@ -1,4 +1,6 @@
-INSERT INTO work_type (name) values ('Morning Shift');
-INSERT INTO work_type (name) values  ('Afternoon Shift');
-INSERT INTO work_type (name) values  ('Night Shift');
-INSERT INTO work_type (name) values  ('Full Day');
+
+
+insert into work_type (name) values ('Work At Company');
+insert into work_type (name) values ('Work at Home');
+insert into work_type (name) values ('Go On Bussiness');
+insert into work_type (name) values ('Leave');

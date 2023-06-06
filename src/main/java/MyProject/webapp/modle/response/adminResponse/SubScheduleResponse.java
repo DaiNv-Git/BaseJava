@@ -20,11 +20,15 @@ public class SubScheduleResponse {
     private String endTime;
     @JsonProperty(value = "shiftName")
     private String shiftName;
+    @JsonProperty(value = "workTypeName")
+    private String workTypeName;
+
 
     public SubScheduleResponse(WorkingScheduleEntity event) throws GeneralException {
         this.scheduleId = event.getId();
         this.startTime = DateUtils.parseLocalTimeToString(event.getStartTime());
         this.endTime = DateUtils.parseLocalTimeToString(event.getEndTime());
+        this.workTypeName = event.getWorkType().getName();
         this.shiftName = event.getShift().getName();
     }
 }

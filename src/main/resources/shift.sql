@@ -1,4 +1,4 @@
-insert into shift (name) values ('Work At Company');
-insert into shift (name) values ('Work at Home');
-insert into shift (name) values ('Go On Bussiness');
-insert into shift (name) values ('Leave');
+INSERT INTO shift (name) values ('Morning Shift');
+INSERT INTO shift (name) values  ('Afternoon Shift');
+INSERT INTO shift (name) values  ('Night Shift');
+INSERT INTO shift (name) values  ('Full Day');
