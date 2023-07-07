@@ -1,4 +1,4 @@
-package MyProject.webapp.controller.admin;
+package MyProject.webapp.controller;
 
 import MyProject.webapp.jwt.JwtUtils;
 import MyProject.webapp.jwt.UserDetailsImpl;

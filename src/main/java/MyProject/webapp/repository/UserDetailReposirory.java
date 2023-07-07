@@ -1,4 +1,4 @@
-package MyProject.webapp.repository.repositoryjpa;
+package MyProject.webapp.repository;
 
 import MyProject.webapp.modle.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

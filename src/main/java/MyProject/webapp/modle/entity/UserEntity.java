@@ -1,5 +1,4 @@
 package MyProject.webapp.modle.entity;
-
 import MyProject.webapp.exception.GeneralException;
 import MyProject.webapp.modle.request.UserForm;
 import MyProject.webapp.utils.ConvertUtils;
@@ -10,13 +9,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.persistence.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "Users")
@@ -56,10 +52,6 @@ public class UserEntity {
     private byte[] image;
     @Column(name = "description")
     private String description;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Transient
-    private List<WorkingScheduleEntity> workingSchedules = new ArrayList<>();
 
     public UserEntity(UserForm userRequest) throws IOException, GeneralException {
         BeanUtils.copyProperties(userRequest, this);

@@ -6,7 +6,7 @@ import MyProject.webapp.modle.entity.UserEntity;
 import MyProject.webapp.modle.request.ChangePasswordForm;
 import MyProject.webapp.modle.request.UserForm;
 import MyProject.webapp.modle.response.UserDetailResponse;
-import MyProject.webapp.repository.repositoryjpa.UserDetailReposirory;
+import MyProject.webapp.repository.UserDetailReposirory;
 import MyProject.webapp.service.UserService;
 import MyProject.webapp.utils.Messageutils;
 import javassist.NotFoundException;
